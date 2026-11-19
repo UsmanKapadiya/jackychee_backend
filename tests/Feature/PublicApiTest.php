@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\PortfolioItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PublicApiTest extends TestCase
@@ -48,6 +49,24 @@ class PublicApiTest extends TestCase
 
         $this->getJson('/api/v1/site')->assertOk()->assertJsonPath('data.menu.0.slug', 'contact');
         $this->getJson('/api/v1/pages/contact')->assertOk()->assertJsonPath('data.title', 'Contact');
+    }
+
+    public function test_page_response_uses_current_host_for_legacy_storage_image_urls(): void
+    {
+        Page::create([
+            'title' => 'Contact',
+            'slug' => 'contact',
+            'social_icons' => '<img src="https://api.jackychee.com/storage/wp-uploads/2016/10/social-fb.png">',
+            'contact_info' => '<a href="https://api.jackychee.com/about">About</a>',
+        ]);
+
+        $this->getJson('/api/v1/pages/contact')
+            ->assertOk()
+            ->assertJsonPath(
+                'data.social_icons',
+                '<img src="'.rtrim(Storage::disk('public')->url('/'), '/').'/wp-uploads/2016/10/social-fb.png">'
+            )
+            ->assertJsonPath('data.contact_info', '<a href="https://api.jackychee.com/about">About</a>');
     }
 
     public function test_security_headers_are_sent(): void
