@@ -4,7 +4,7 @@
     "description": "Jacky Chee portfolio - Laravel 13 REST API (converted from WordPress)",
     "license": "proprietary",
     "require": {
-        "php": "^8.5.12",
+        "php": "^8.4.1",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.2|^5.0",
         "laravel/tinker": "^2.10|^3.0",
